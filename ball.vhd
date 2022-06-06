@@ -4,45 +4,45 @@ USE IEEE.numeric_std.all;
 USE IEEE.std_logic_unsigned.ALL;
 ------------------------------------------
 ENTITY ball IS
-	PORT	(	clk			: IN 	STD_LOGIC;
-				rst     		: IN 	STD_LOGIC;
-				rst1  	   : IN STD_LOGIC;
-				RAM			: IN	STD_LOGIC_VECTOR(127 DOWNTO 0);
-				SCORE_R		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-				SCORE_L		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-				RAM1			: OUT	STD_LOGIC_VECTOR(127 DOWNTO 0));	 
+	PORT	(		clk		: IN 	STD_LOGIC;			
+				rst     	: IN 	STD_LOGIC;
+				rst1 	        : IN	STD_LOGIC;
+				RAM		: IN	STD_LOGIC_VECTOR(127 DOWNTO 0);
+				SCORE_R		: OUT   STD_LOGIC_VECTOR(3   DOWNTO 0);
+				SCORE_L		: OUT 	STD_LOGIC_VECTOR(3   DOWNTO 0);
+				RAM1		: OUT	STD_LOGIC_VECTOR(127 DOWNTO 0));	 
 END ENTITY;
 --------------------------------------------
 ARCHITECTURE play OF ball IS
 
 	TYPE state IS (IC,WAITING,MOVE,RACKETS,DIAGONAL,STRAIGHT,POINT);--(InitialCondition,DiagonalUpRight,DiagonalDownRight,StraightRight,DiagonalUpLeft,DiagonalDownLeft,StraightLeft,Point)
 	SIGNAL pr_state, nx_state  : state;
-	SIGNAL RAM_S, RAM_O					: 	STD_LOGIC_VECTOR(127 DOWNTO 0):=(others=>'0');
-	SIGNAL ena						:  STD_LOGIC;
-	SIGNAL ena_s						:  STD_LOGIC;
-	SIGNAL max_count				:  UNSIGNED(22 DOWNTO 0):="11111111111111111111111";
-	SIGNAL vel						:  UNSIGNED(22 DOWNTO 0):="11111111111111111111111";
+	SIGNAL RAM_S, RAM_O			:  STD_LOGIC_VECTOR(127 DOWNTO 0):=(others=>'0');
+	SIGNAL ena				:  STD_LOGIC;
+	SIGNAL ena_s				:  STD_LOGIC;
+	SIGNAL max_count			:  UNSIGNED(22 DOWNTO 0):="11111111111111111111111";
+	SIGNAL vel				:  UNSIGNED(22 DOWNTO 0):="11111111111111111111111";
 	SIGNAL max_count_aux			:  UNSIGNED(22 DOWNTO 0):="11111111111111111111111";
-	SIGNAL Up						:  STD_LOGIC;
-	SIGNAL Direc					:  STD_LOGIC;
-	SIGNAL Sense					:  STD_LOGIC;
-	SIGNAL evaluation				:  STD_LOGIC;
-	SIGNAL racket					:  STD_LOGIC;
-	SIGNAL Up_nx					:  STD_LOGIC;
+	SIGNAL Up				:  STD_LOGIC;
+	SIGNAL Direc				:  STD_LOGIC;
+	SIGNAL Sense				:  STD_LOGIC;
+	SIGNAL evaluation			:  STD_LOGIC;
+	SIGNAL racket				:  STD_LOGIC;
+	SIGNAL Up_nx				:  STD_LOGIC;
 	SIGNAL Direc_nx				:  STD_LOGIC;
 	SIGNAL Sense_nx				:  STD_LOGIC;
 	SIGNAL evaluation_nx			:  STD_LOGIC;
-	SIGNAL racket_nx				:  STD_LOGIC;
-	SIGNAL SCORE_Rnx				:  STD_LOGIC;
-	SIGNAL SCORE_Lnx				:  STD_LOGIC;
+	SIGNAL racket_nx			:  STD_LOGIC;
+	SIGNAL SCORE_Rnx			:  STD_LOGIC;
+	SIGNAL SCORE_Lnx			:  STD_LOGIC;
 	SIGNAL SCORE_Rs				:  STD_LOGIC;
 	SIGNAL SCORE_Ls				:  STD_LOGIC;
-	SIGNAL SCORE_Raux				:  UNSIGNED(3 DOWNTO 0):=(OTHERS =>'0');
-	SIGNAL SCORE_Laux				:  UNSIGNED(3 DOWNTO 0):=(OTHERS =>'0');
+	SIGNAL SCORE_Raux			:  UNSIGNED(3 DOWNTO 0):=(OTHERS =>'0');
+	SIGNAL SCORE_Laux			:  UNSIGNED(3 DOWNTO 0):=(OTHERS =>'0');
 	SIGNAL SCORE_Raux1			:  UNSIGNED(3 DOWNTO 0):=(OTHERS =>'0');
 	SIGNAL SCORE_Laux1			:  UNSIGNED(3 DOWNTO 0):=(OTHERS =>'0');
-	SIGNAL p_v						:	INTEGER;
-	SIGNAL p_v1						:	INTEGER;
+	SIGNAL p_v				:  INTEGER;
+	SIGNAL p_v1				:  INTEGER;
 BEGIN
 -----Sequiential section:---------------------------------
 PROCESS(rst,clk,rst1) 
@@ -51,14 +51,14 @@ BEGIN
 		SCORE_Raux1  <= "0000";
 		SCORE_Laux1  <= "0000";
 		max_count_aux<="11111111111111111111111";
-		pr_state	    <=	IC;
+		pr_state     <=	IC;
 		ELSIF(rising_edge(clk)) THEN
-		pr_state	<=	nx_state;
-		SCORE_Rs  <= SCORE_Rnx;
-		SCORE_Ls  <= SCORE_Lnx;
-		Up_nx		<=Up;
-		Direc_nx	<=Direc;
-		Sense_nx	<=	Sense;	
+		pr_state  <=nx_state;
+		SCORE_Rs  <=SCORE_Rnx;
+		SCORE_Ls  <=SCORE_Lnx;
+		Up_nx	  <=Up;
+		Direc_nx  <=Direc;
+		Sense_nx  <=Sense;	
 		evaluation_nx<=evaluation;
 		racket_nx<=racket;
 		max_count_aux<=max_count;
@@ -70,18 +70,18 @@ END PROCESS;
 MATRIZR:ENTITY work.registerc
 	PORT MAP(
 	         valueIn  =>RAM_S,
-				rst	=> rst,
-				rst1  =>rst1,
-				clk=> clk,
-				valueOut=>RAM_O);
+		rst 	=> rst,
+		rst1 	=>rst1,
+		clk  	=> clk,
+		valueOut=>RAM_O);
 ----------------REGISTRO VECTOR----------------------------
 PV:ENTITY work.registerb
 	PORT MAP(
-	         valueIn  =>p_v,
-				rst	=> rst,
-				rst1  =>rst1,
-				clk=> clk,
-				valueOut=>p_v1);
+	         valueIn =>p_v,
+		 rst	 => rst,
+		 rst1    =>rst1,
+		 clk	 => clk,
+		 valueOut=>p_v1);
 ----Combinational section:--------------------------------
 	PROCESS (pr_state,p_v,RAM_s,RAM,p_v1,ena,evaluation,racket,Sense,Direc,Up,evaluation_nx,racket_nx,Sense_nx,Direc_nx,Up_nx,SCORE_Lnx,SCORE_Ls,SCORE_Rnx,SCORE_Rs)
 		BEGIN
@@ -292,21 +292,23 @@ END PROCESS;
 RAM1<=RAM_O;
 -------------------------------CONTADORES-----------------------------------
 Contador2:ENTITY work.univ_bin_counter1
-		  GENERIC MAP( N				=>23)
-		  PORT MAP(		clk		 	=>	clk,
-							rst			=> rst,
-							rst1  =>rst1,
-							ena			=> '1',
-							max_count	=> max_count,
-							max_tick		=>ena);	
+		  GENERIC MAP( N	=>23)
+		  PORT MAP(   clk 	=>clk,
+			      rst	=> rst,
+			      rst1 	=>rst1,
+			      ena	=> '1',
+			      max_count	=> max_count,
+			      max_tick	=>ena);	
+	
 	Contador3:ENTITY work.univ_bin_counter1
-		  GENERIC MAP( N				=>23)
-		  PORT MAP(		clk		 	=>	clk,
-							rst			=> rst,
-							rst1  =>rst1,
-							ena			=> '1',
-							max_count	=> vel,
-							max_tick		=>ena_s);								
+		  GENERIC MAP( 	N	=>23)
+		  PORT 	  MAP(	clk 	  =>clk,
+			      	rst	  =>rst,
+				rst1      =>rst1,
+				ena	  => '1',
+				max_count => vel,
+				max_tick  =>ena_s);
+		
 max_count<= max_count_aux-10000 WHEN ena_s='1' ELSE
 				max_count_aux;
 --------------------SALIDA SCORE-------------------------------
